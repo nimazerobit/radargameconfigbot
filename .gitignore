@@ -1,4 +1,4 @@
 config.json
-users.db
+bot.db
 configs/*
 *__pycache__*
