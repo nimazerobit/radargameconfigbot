@@ -1,0 +1,14 @@
+{
+  "BOT_TOKEN": "BOT-TOKEN",
+  "BOT_USERNAME": "BOT-USERNAME",
+  "ADMINS": [123456789],
+  "OWNERS": [123456789],
+  "DB_PATH": "bot.db",
+  "VERSION": "v2.0.0",
+  "REQUIRED_CHATS": [
+    {
+      "title": "test-name",
+      "username": "@testgrouporchannel"
+    }
+  ]
+}
