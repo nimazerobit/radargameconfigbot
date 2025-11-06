@@ -5,7 +5,7 @@ import os
 
 from core.config_loader import CFG
 
-def get_token(username, password):
+async def get_token(username, password):
     try:
         res = requests.post(f"{CFG["َRADARGAME_API_BASE"]}/auth/login", json={"username": username, "password": password})
         data = res.json()
@@ -14,7 +14,7 @@ def get_token(username, password):
     except:
         return None
 
-def get_servers(token):
+async def get_servers(token):
     try:
         res = requests.get(f"{CFG["َRADARGAME_API_BASE"]}/user/servers", headers={"Authorization": f"Bearer {token}"})
         data = res.json()
@@ -22,7 +22,7 @@ def get_servers(token):
     except:
         return []
 
-def get_config(token, server_id):
+async def get_config(token, server_id):
     try:
         res = requests.get(f"{CFG["َRADARGAME_API_BASE"]}/user/account/getAccount",
                            headers={"Authorization": f"Bearer {token}"},
@@ -32,10 +32,10 @@ def get_config(token, server_id):
     except:
         return None
 
-def generate_random_string(length=8):
+async def generate_random_string(length=8):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
-def build_config_file(data):
+async def build_config_file(data):
     rand = generate_random_string()
     primary_dns = data.get("primary_dns", "8.8.8.8")
     secondary_dns = data.get("secondary_dns", "1.1.1.1")
