@@ -18,6 +18,9 @@ def main_menu_keyboard():
     return InlineKeyboardMarkup(rows)
 
 async def show_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, edit: bool = False):
+    await ensure_user(update)
+    if await banned_guard(update):
+        return
     main_menu_text = TEXTS["main_menu"]["title"].format(version=CFG["VERSION"])
     if edit and update.callback_query:
         await update.callback_query.edit_message_text(f'{main_menu_text}', reply_markup=main_menu_keyboard(), parse_mode="HTML")

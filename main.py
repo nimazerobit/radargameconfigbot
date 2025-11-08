@@ -10,6 +10,9 @@ from core.admin_system import show_all_users, broadcast, adminpanel, admin_useri
 from core.main_menu_handler import show_main_menu, main_menu_callbacks
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await ensure_user(update)
+    if await banned_guard(update):
+        return
     await update.message.reply_text(TEXTS["help_text"], parse_mode="HTML")
     return
 
