@@ -13,7 +13,7 @@ from core.utils import ensure_user
 # RadarGame Functions
 async def get_token(username, password):
     try:
-        res = requests.post(f"{CFG["َRADARGAME_API_BASE"]}/auth/login", json={"username": username, "password": password})
+        res = requests.post(f"{CFG["RADARGAME_API_BASE"]}/auth/login", json={"username": username, "password": password})
         data = res.json()
         if not data["isSuccess"]: return None
         return data["result"]["accessToken"]
@@ -22,7 +22,7 @@ async def get_token(username, password):
 
 async def get_servers(token):
     try:
-        res = requests.get(f"{CFG["َRADARGAME_API_BASE"]}/user/servers", headers={"Authorization": f"Bearer {token}"})
+        res = requests.get(f"{CFG["RADARGAME_API_BASE"]}/user/servers", headers={"Authorization": f"Bearer {token}"})
         data = res.json()
         return data["result"] if data["isSuccess"] else []
     except:
@@ -30,7 +30,7 @@ async def get_servers(token):
 
 async def get_config(token, server_id):
     try:
-        res = requests.get(f"{CFG["َRADARGAME_API_BASE"]}/user/account/getAccount",
+        res = requests.get(f"{CFG["RADARGAME_API_BASE"]}/user/account/getAccount",
                            headers={"Authorization": f"Bearer {token}"},
                            params={"serverId": server_id})
         data = res.json()
