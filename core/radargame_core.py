@@ -175,6 +175,9 @@ async def new_config(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.setMessageReaction(user_id, login_success_message.id, reaction=ReactionTypeEmoji('⚡'))
             await update.effective_chat.send_message(f"<b>آیدی تلگرام:</b><pre>{user_id}</pre>\n<b>ایمیل شما: </b><pre>{account["username"]}</pre>", reply_to_message_id=login_success_message.id, parse_mode="HTML")
             return await show_servers(update, context)
+    else:
+        await update.effective_chat.send_message(f"⚠️ لطفا قبل از دریافت کانفیگ، اکانت جدید اضافه کنید", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(TEXTS["main_menu"]["buttons"]["change_account"], callback_data="change_account")]]), parse_mode="HTML")
+        return
 
 async def show_servers(update: Update, context: ContextTypes.DEFAULT_TYPE):
     servers = await get_servers(context.user_data["token"])
