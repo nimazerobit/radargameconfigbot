@@ -117,10 +117,12 @@ async def show_all_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not users:
         await update.message.reply_text("هیچ کاربری یافت نشد ❌")
         return
+    
+    users = sorted(users, key=lambda u: u["created_at"] or 0)
 
-    msg = f"📊 تعداد کل کاربران: {len(users)}\n\n"
-    msg += "\n".join([f"<code>{uid}</code> - {uname}" for uid, uname in users])
-    await update.message.reply_text(msg[:4096], parse_mode="HTML")  # Telegram max message size
+    message = f"📊 تعداد کل کاربران: {len(users)}\n\n"
+    message += "\n".join([f"🔹<code>{user["user_id"]}</code> - {user["full_name"] or "بدون نام"}" for user in users])
+    await update.message.reply_text(message[:4096], parse_mode="HTML")  # Telegram max message size
 
 ### --- Admin view user information Command --- ###
 async def admin_userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int = None):
