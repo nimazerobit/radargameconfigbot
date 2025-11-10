@@ -166,10 +166,8 @@ async def admin_userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE, use
     banned = row["banned"]
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(
-            "✅ رفع بن" if banned else "🚫 بن",
-            callback_data=f"admin_banuser:{row['user_id']}"
-        )]
+        [InlineKeyboardButton("🗑 حذف تمام اکانت های رادارگیم", callback_data=f"admin_removeall:{row['user_id']}")],
+        [InlineKeyboardButton("✅ رفع بن" if banned else "🚫 بن", callback_data=f"admin_banuser:{row['user_id']}")],
     ])
 
     if is_edit:
@@ -225,6 +223,23 @@ async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         DBH.set_ban(target_user_id, not user["banned"])
         await query.answer("✅ وضعیت بن کاربر توسط ادمین تغییر کرد", show_alert=True)
+        await admin_userinfo(update, context, target_user_id)
+        return
+    
+    elif data.startswith("admin_removeall:"):
+        target_user_id = int(data.split(":")[1])
+        user = DBH.get_user(target_user_id)
+
+        # Check is user available
+        if not user:
+            await query.answer(TEXTS["errors"]["user_notfound"], show_alert=True)
+            return
+        
+        result = DBH.delete_all_radargame_accounts_for_user(target_user_id)
+        if result > 0:
+            await query.answer(f"✅ تعداد {result} اکانت با موفقیت حذف شد", show_alert=True)
+        else:
+            await query.answer(f"⚠️ هیچ اکانتی برای حذف یافت نشد", show_alert=True)
         await admin_userinfo(update, context, target_user_id)
         return
 

@@ -163,8 +163,9 @@ class DB:
             conn.commit()
             return cursor.rowcount > 0
 
-    def delete_all_radargame_accounts_for_user(self, user_id: int):
+    def delete_all_radargame_accounts_for_user(self, user_id: int) -> int:
         with self._connect() as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM radargame WHERE user_id = ?", (user_id,))
             conn.commit()
+            return cursor.rowcount
