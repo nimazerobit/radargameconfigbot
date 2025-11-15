@@ -137,36 +137,38 @@ async def check_required_chats(update: Update, context: ContextTypes.DEFAULT_TYP
 
     for item in CFG["REQUIRED_CHATS"]:
         title = item["title"]
-        chat = item["username"]
+        join_link = item["join_link"]
+        chat_id = item["chat_id"]
+
 
         try:
-            bot_member = await context.bot.get_chat_member(chat, context.bot.id)
+            bot_member = await context.bot.get_chat_member(chat_id, context.bot.id)
             if bot_member.status in ["left", "kicked"]:
-                if chat not in reported_missing_chats:
+                if chat_id not in reported_missing_chats:
                     for admin_id in CFG["OWNERS"]:
                         await context.bot.send_message(
                             admin_id,
-                            f"⚠️ ربات در چت {chat} ({title}) عضو نیست!"
+                            f"⚠️ ربات در چت {chat_id} ({title}) عضو نیست!"
                         )
-                    reported_missing_chats.add(chat)
+                    reported_missing_chats.add(chat_id)
                 return True
         except BadRequest:
-            if chat not in reported_missing_chats:
+            if chat_id not in reported_missing_chats:
                 for admin_id in CFG["OWNERS"]:
                     await context.bot.send_message(
                         admin_id,
-                        f"❌ دسترسی به چت {chat} ({title}) وجود ندارد یا پیدا نشد."
+                        f"❌ دسترسی به چت {chat_id} ({title}) وجود ندارد یا پیدا نشد."
                     )
-                reported_missing_chats.add(chat)
+                reported_missing_chats.add(chat_id)
             return True
 
-        if not await is_user_joined(context.bot, chat, user_id):
-            not_joined_user.append((title, chat))
+        if not await is_user_joined(context.bot, chat_id, user_id):
+            not_joined_user.append((title, join_link))
 
     if not_joined_user:
         buttons = [
-            [InlineKeyboardButton(title, url=f"https://t.me/{chat.lstrip('@')}")]
-            for title, chat in not_joined_user
+            [InlineKeyboardButton(title, url=join_link)]
+            for title, join_link in not_joined_user
         ]
         reply_markup = InlineKeyboardMarkup(buttons)
 

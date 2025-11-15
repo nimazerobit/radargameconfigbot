@@ -8,7 +8,8 @@
   "REQUIRED_CHATS": [
     {
       "title": "test-name",
-      "username": "@testgrouporchannel"
+      "join_link": "https://t.me/YOURINVITELINK",
+      "chat_id": -100123456789
     }
   ]
 }
