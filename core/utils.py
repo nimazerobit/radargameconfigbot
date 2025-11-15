@@ -110,12 +110,15 @@ async def ensure_user(update: Update, update_last_active: bool = True) -> int:
 async def banned_guard(update: Update) -> bool:
     user = update.effective_user
     if not user:
-        return True
+        return False
     row = DBH.get_user(user.id)
     if row and row["banned"]:
-        await update.effective_chat.send_message(f'<b>⛔️ دسترسی شما مسدود است.</b>', parse_mode="HTML")
-        return True
-    return False
+        if update.callback_query:
+            await update.callback_query.answer("⛔️ دسترسی شما مسدود است")
+        else:
+            await update.effective_chat.send_message(f"⛔️ دسترسی شما مسدود است", parse_mode="HTML")
+        return False
+    return True
 
 ### --- Check is user joined channel/group or not --- ###
 reported_missing_chats = set()
@@ -146,9 +149,6 @@ async def check_required_chats(update: Update, context: ContextTypes.DEFAULT_TYP
                             f"⚠️ ربات در چت {chat} ({title}) عضو نیست!"
                         )
                     reported_missing_chats.add(chat)
-                await update.message.reply_text(
-                    f"❌ خطا در بررسی جوین اجباری لطفا با ادمین در ارتباط باشید\n/dev"
-                )
                 return True
         except BadRequest:
             if chat not in reported_missing_chats:
@@ -158,9 +158,6 @@ async def check_required_chats(update: Update, context: ContextTypes.DEFAULT_TYP
                         f"❌ دسترسی به چت {chat} ({title}) وجود ندارد یا پیدا نشد."
                     )
                 reported_missing_chats.add(chat)
-            await update.message.reply_text(
-                f"❌ خطا در بررسی جوین اجباری لطفا با ادمین در ارتباط باشید\n/dev"
-            )
             return True
 
         if not await is_user_joined(context.bot, chat, user_id):
@@ -173,13 +170,24 @@ async def check_required_chats(update: Update, context: ContextTypes.DEFAULT_TYP
         ]
         reply_markup = InlineKeyboardMarkup(buttons)
 
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             "🚫 برای استفاده از بات باید در کانال و گروه‌های زیر عضو شوید:",
             reply_markup=reply_markup
         )
-        return True
+        return False
 
-    return False
+    return True
+
+async def check_user(update: Update, context: ContextTypes.DEFAULT_TYPE, check_force_join: bool=True, check_ban: bool=True, check_user_db: bool=True):
+    if check_user_db:
+        await ensure_user(update)
+    if check_ban:
+        if not await banned_guard(update):
+            return False
+    if check_force_join:
+        if not await check_required_chats(update, context):
+            return False
+    return True
 
 ### --- Check is user has active chat with bot --- ###
 async def has_active_private_chat(bot, user_id: int) -> bool:

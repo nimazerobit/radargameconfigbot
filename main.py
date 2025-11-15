@@ -5,20 +5,18 @@ from core.texts import TEXTS
 from core.config_loader import DBH, CFG, DNS_LIST
 from core.db import *
 from core.radargame_core import *
-from core.utils import ensure_user, banned_guard
+from core.utils import check_user
 from core.admin_system import show_all_users, broadcast, adminpanel, admin_userinfo, admin_callbacks
 from core.main_menu_handler import show_main_menu, main_menu_callbacks
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await ensure_user(update)
-    if await banned_guard(update):
+    if not await check_user(update, context):
         return
     await update.message.reply_text(TEXTS["help_text"], parse_mode="HTML")
     return
 
 async def developer(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await ensure_user(update)
-    if await banned_guard(update):
+    if not await check_user(update, context):
         return
     message_id = update.effective_message.message_id
     markup = InlineKeyboardMarkup([[InlineKeyboardButton(r"¯\_(ツ)_/¯", callback_data="emptycallback")]])
@@ -34,6 +32,9 @@ async def global_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data or ""
     # user_id = update.effective_user.id
+
+    if not await check_user(update, context, check_user_db=False):
+        return
 
     # Empty Callback
     if data == "emptycallback":

@@ -41,14 +41,16 @@ def admin_panel_text():
     return panel_text
 
 async def adminpanel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await ensure_user(update)
+    if not await check_user(update, context, check_force_join=False):
+        return
     if not is_admin(update.effective_user.id):
         return
     await update.effective_chat.send_message(admin_panel_text(), reply_markup=admin_panel_keyboard(), parse_mode="HTML")
 
 ### --- Broadcast Command --- ###
 async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await ensure_user(update)
+    if not await check_user(update, context, check_force_join=False):
+        return
 
     # Check is owner
     if not is_owner(update.effective_user.id):
@@ -126,7 +128,8 @@ async def show_all_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ### --- Admin view user information Command --- ###
 async def admin_userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int = None):
-    await ensure_user(update)
+    if not await check_user(update, context, check_force_join=False):
+        return
     # Check is admin or owner
     if not is_admin(update.effective_user.id):
         return
@@ -197,7 +200,8 @@ async def generate_userinfo_text(user_id: int) -> str:
 
 ### --- Admin Callbacks --- ###
 async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await ensure_user(update)
+    if not await check_user(update, context, check_force_join=False):
+        return
     
     query = update.callback_query
     data = query.data or ""

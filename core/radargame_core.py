@@ -8,7 +8,7 @@ import json
 
 from core.config_loader import DBH, CFG, DNS_LIST
 from core.texts import TEXTS
-from core.utils import ensure_user
+from core.utils import check_user
 
 # RadarGame Functions
 async def get_token(username, password):
@@ -70,7 +70,8 @@ async def build_config_file(data):
 
 # RadarGame account manager
 async def change_radar_account(update: Update, context: ContextTypes.DEFAULT_TYPE, page: int = 1, edit: bool = False):
-    await ensure_user(update)
+    if not await check_user(update, context):
+        return
 
     user_id = update.effective_user.id
     radargame_account = DBH.get_user_radargame_accounts(user_id)
@@ -164,6 +165,9 @@ async def get_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # New config
 async def new_config(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_user(update, context):
+        return
+
     user_id = update.callback_query.from_user.id
     account = DBH.get_active_radargame_account(user_id)
 
@@ -197,6 +201,9 @@ async def show_servers(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ### --- RadarGame Callbacks --- ###
 async def radargame_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_user(update, context):
+        return
+
     query = update.callback_query
     data = query.data or ""
     user_id = update.effective_user.id
