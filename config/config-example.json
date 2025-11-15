@@ -5,6 +5,7 @@
   "OWNERS": [123456789],
   "DB_PATH": "bot.db",
   "VERSION": "v2.0.0",
+  "َRADARGAME_API_BASE": "https://api.radar.game/v1",
   "REQUIRED_CHATS": [
     {
       "title": "test-name",
