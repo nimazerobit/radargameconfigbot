@@ -16,29 +16,25 @@ def admin_panel_keyboard():
     rows = [
         [
             InlineKeyboardButton(
-                "👤 غیر فعال کردن اعلان ثبت‌نام" if ADMIN_PANEL["notify_new_user"] else "👤 فعال کردن اعلان ثبت‌نام",
+                TEXTS["admin"]["panel_keyboard"]["new_user_active"] if ADMIN_PANEL["notify_new_user"] else TEXTS["admin"]["panel_keyboard"]["new_user_inactive"],
                 callback_data="toggle_user_notify"
             )
         ],
         [
             InlineKeyboardButton(
-                "🔕 غیر فعال کردن اعلان کانفیگ جدید" if ADMIN_PANEL["notify_new_config"] else "🔔 فعال کردن اعلان کانفیگ جدید",
+                TEXTS["admin"]["panel_keyboard"]["new_config_active"] if ADMIN_PANEL["notify_new_config"] else TEXTS["admin"]["panel_keyboard"]["new_config_inactive"],
                 callback_data="toggle_config_notify"
             )
         ],
         [
-            InlineKeyboardButton("📊 وضعیت ربات", callback_data="status_panel")
+            InlineKeyboardButton(TEXTS["admin"]["panel_keyboard"]["status"], callback_data="status_panel")
         ]
     ]
     return InlineKeyboardMarkup(rows)
 
 def admin_panel_text():
-    panel_text = (
-        "<b>⚙️ پنل مدیریت</b>\n"
-        f"<b>اعلان کاربر جدید:</b> {'فعال ✅' if ADMIN_PANEL['notify_new_user'] else 'غیرفعال ❌'}\n"
-        f"<b>اعلان کانفیگ جدید:</b> {'فعال ✅' if ADMIN_PANEL['notify_new_config'] else 'غیرفعال ❌'}"
-    )
-    return panel_text
+    return TEXTS["admin"]["panel_text"].format(user_notify_status='فعال ✅' if ADMIN_PANEL['notify_new_user'] else 'غیرفعال ❌', 
+                                                config_notify_status='فعال ✅' if ADMIN_PANEL['notify_new_config'] else 'غیرفعال ❌')
 
 async def adminpanel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await check_user(update, context, check_force_join=False):
@@ -58,11 +54,7 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # If not a reply, show usage help
     if not update.message or not update.message.reply_to_message:
-        await update.effective_chat.send_message(
-            "برای ارسال پیام همگانی، این دستور را روی پیام مورد نظر ریپلای کنید.\n"
-            "یا یک شناسه (آیدی عددی، یوزرنیم، یا هش کاربر) بدهید.",
-            parse_mode="HTML"
-        )
+        await update.effective_chat.send_message(TEXTS["admin"]["broadcast"]["message"], parse_mode="HTML")
         return
     
     # Check if broadcasting to all or single user
@@ -106,7 +98,7 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             failed += 1
     
     await update.effective_chat.send_message(
-        f"✅ <b>ارسال شد</b>\n\n🟢 موفق : {success}\n🔴 ناموفق : {failed}",
+        TEXTS["admin"]["broadcast"]["result"].format(success=success, failed=failed),
         parse_mode="HTML"
     )
 
@@ -117,7 +109,7 @@ async def show_all_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     users = DBH.get_all_users()
     if not users:
-        await update.message.reply_text("هیچ کاربری یافت نشد ❌")
+        await update.message.reply_text(TEXTS["errors"]["user_notfound"])
         return
     
     users = sorted(users, key=lambda u: u["created_at"] or 0)
@@ -208,7 +200,7 @@ async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     if not is_admin(user_id):
-        await query.answer("دسترسی فقط برای ادمین های فعال ❌", show_alert=True)
+        await query.answer(TEXTS["errors"]["access_denied"], show_alert=True)
         return
     
     elif data.startswith("admin_banuser:"):
@@ -226,7 +218,7 @@ async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         DBH.set_ban(target_user_id, not user["banned"])
-        await query.answer("✅ وضعیت بن کاربر توسط ادمین تغییر کرد", show_alert=True)
+        await query.answer(TEXTS["admin"]["ban_state_changed"], show_alert=True)
         await admin_userinfo(update, context, target_user_id)
         return
     
@@ -241,19 +233,19 @@ async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         result = DBH.delete_all_radargame_accounts_for_user(target_user_id)
         if result > 0:
-            await query.answer(f"✅ تعداد {result} اکانت با موفقیت حذف شد", show_alert=True)
+            await query.answer(TEXTS["admin"]["account_remove"]["result"].format(result=result), show_alert=True)
         else:
-            await query.answer(f"⚠️ هیچ اکانتی برای حذف یافت نشد", show_alert=True)
+            await query.answer(TEXTS["admin"]["account_remove"]["not_found"], show_alert=True)
         await admin_userinfo(update, context, target_user_id)
         return
 
     elif data == "toggle_user_notify":
         ADMIN_PANEL["notify_new_user"] = not ADMIN_PANEL["notify_new_user"]
-        await query.answer("✅ تنظیمات ذخیره شد")
+        await query.answer(TEXTS["admin"]["setting_saved"])
 
     elif data == "toggle_config_notify":
         ADMIN_PANEL["notify_new_config"] = not ADMIN_PANEL["notify_new_config"]
-        await query.answer("✅ تنظیمات ذخیره شد")
+        await query.answer(TEXTS["admin"]["setting_saved"])
 
     elif data == "status_panel":
         with DBH._connect() as conn:
@@ -266,16 +258,8 @@ async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             today_ts = int(today.timestamp())
             today_active = cursor.execute("SELECT COUNT(*) FROM users WHERE last_active >= ?", (today_ts,)).fetchone()[0]
 
-        status_text = (
-            f"<b>📊 آمار ربات</b>\n"
-            f"• کل کاربران: <b>{total_users}</b>\n"
-            f"• تعداد اکانت های رادارگیم: <b>{total_radargame}</b>\n"
-            f"• کاربران بن شده: <b>{banned_users}</b>\n"
-            f"• کاربران فعال امروز: <b>{today_active}</b>\n"
-        )
-
         await query.edit_message_text(
-            status_text,
+            TEXTS["admin"]["status_result"].format(total_users=total_users, total_radargame=total_radargame, banned_users=banned_users, today_active=today_active),
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(TEXTS["admin"]["backtomenu"], callback_data="adminpanel")]
             ]),

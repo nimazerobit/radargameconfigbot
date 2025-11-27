@@ -9,6 +9,7 @@ import time
 import jdatetime
 from datetime import timezone, timedelta
 
+from core.texts import TEXTS
 from core.config_loader import DBH, CFG
 
 ### --- Generate Hash --- ###
@@ -114,9 +115,9 @@ async def banned_guard(update: Update) -> bool:
     row = DBH.get_user(user.id)
     if row and row["banned"]:
         if update.callback_query:
-            await update.callback_query.answer("⛔️ دسترسی شما مسدود است")
+            await update.callback_query.answer(TEXTS["errors"]["banned"])
         else:
-            await update.effective_chat.send_message(f"⛔️ دسترسی شما مسدود است", parse_mode="HTML")
+            await update.effective_chat.send_message(TEXTS["errors"]["banned"], parse_mode="HTML")
         return False
     return True
 
@@ -148,7 +149,7 @@ async def check_required_chats(update: Update, context: ContextTypes.DEFAULT_TYP
                     for admin_id in CFG["OWNERS"]:
                         await context.bot.send_message(
                             admin_id,
-                            f"⚠️ ربات در چت {chat_id} ({title}) عضو نیست!"
+                            text=TEXTS["required_chat"]["bot_not_joined"].format(chat_id=chat_id, title=title)
                         )
                     reported_missing_chats.add(chat_id)
                 return True
@@ -157,7 +158,7 @@ async def check_required_chats(update: Update, context: ContextTypes.DEFAULT_TYP
                 for admin_id in CFG["OWNERS"]:
                     await context.bot.send_message(
                         admin_id,
-                        f"❌ دسترسی به چت {chat_id} ({title}) وجود ندارد یا پیدا نشد."
+                        text=TEXTS["required_chat"]["bot_no_access"].format(chat_id=chat_id, title=title)
                     )
                 reported_missing_chats.add(chat_id)
             return True
@@ -173,7 +174,7 @@ async def check_required_chats(update: Update, context: ContextTypes.DEFAULT_TYP
         reply_markup = InlineKeyboardMarkup(buttons)
 
         await update.effective_message.reply_text(
-            "🚫 برای استفاده از بات باید در کانال و گروه‌های زیر عضو شوید:",
+            TEXTS["required_chat"]["message"],
             reply_markup=reply_markup
         )
         return False
