@@ -9,8 +9,7 @@ import time
 import jdatetime
 from datetime import timezone, timedelta
 
-from core.texts import TEXTS
-from core.config_loader import DBH, CFG
+from core.config_loader import DBH, CFG, TEXTS
 
 ### --- Generate Hash --- ###
 def gen_hash(n: int = 12) -> str:

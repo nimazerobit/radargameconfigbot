@@ -1,8 +1,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
-from core.config_loader import DBH, CFG, reload_config
-from core.texts import TEXTS
+from core.config_loader import DBH, CFG, reload_config, TEXTS
 from core.utils import *
 
 # Admin panel settings:

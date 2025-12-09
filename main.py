@@ -1,8 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
 
-from core.texts import TEXTS
-from core.config_loader import DBH, CFG, DNS_LIST
+from core.config_loader import DBH, CFG, DNS_LIST, TEXTS
 from core.db import *
 from core.radargame_core import *
 from core.utils import check_user

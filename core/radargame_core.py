@@ -6,8 +6,7 @@ import string
 import os
 import json
 
-from core.config_loader import DBH, CFG, DNS_LIST
-from core.texts import TEXTS
+from core.config_loader import DBH, CFG, DNS_LIST, TEXTS
 from core.utils import check_user
 
 # RadarGame Functions

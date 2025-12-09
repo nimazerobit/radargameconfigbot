@@ -1,8 +1,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
-from core.texts import TEXTS
-from core.config_loader import DBH, CFG
+from core.config_loader import DBH, CFG, TEXTS
 from core.radargame_core import change_radar_account, new_config
 from core.utils import *
 
