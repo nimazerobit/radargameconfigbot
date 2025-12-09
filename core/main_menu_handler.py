@@ -2,8 +2,8 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from core.config_loader import DBH, CFG, TEXTS
-from core.radargame_core import change_radar_account, new_config
-from core.utils import *
+from core.radargame_core import new_config
+from core.utils import check_user, now_ts, fmt_ts, human_ago
 
 ### --- Main Menu --- ###
 def main_menu_keyboard():

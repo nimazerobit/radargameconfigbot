@@ -1,6 +1,6 @@
 import sqlite3
 from pathlib import Path
-from typing import Optional, Any, Dict, Tuple, List
+from typing import Optional, Any, Dict
 import time
 
 class DB:

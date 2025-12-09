@@ -1,9 +1,8 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
 
-from core.config_loader import DBH, CFG, DNS_LIST, TEXTS
-from core.db import *
-from core.radargame_core import *
+from core.config_loader import CFG, TEXTS
+from core.radargame_core import radargame_callbacks, new_radar_account, get_username, get_password, USERNAME, PASSWORD
 from core.utils import check_user
 from core.admin_system import show_all_users, broadcast, adminpanel, admin_userinfo, admin_callbacks
 from core.main_menu_handler import show_main_menu, main_menu_callbacks

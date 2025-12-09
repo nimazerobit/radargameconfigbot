@@ -2,7 +2,7 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from core.config_loader import DBH, TEXTS, reload_config, reload_texts, reload_dns_list
-from core.utils import *
+from core.utils import check_user, is_admin, is_owner, now_ts, fmt_ts, human_ago
 
 # Admin panel settings:
 ADMIN_PANEL = {
