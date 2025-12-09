@@ -48,11 +48,19 @@ class DB:
             conn.commit()
 
     # ——— users ———
-    def get_all_users(self) -> list:
-        with self._connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users")
-            return cursor.fetchall()
+    def count_users(self) -> int:
+        with self._connect() as con:
+            cur = con.cursor()
+            return cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+
+    def get_users_page(self, limit: int, offset: int):
+        with self._connect() as con:
+            cur = con.cursor()
+            cur.execute(
+                "SELECT * FROM users ORDER BY created_at ASC LIMIT ? OFFSET ?",
+                (limit, offset)
+            )
+            return cur.fetchall()
         
     def get_user(self, user_id: int) -> Optional[sqlite3.Row]:
         with self._connect() as conn:

@@ -10,6 +10,7 @@ ADMIN_PANEL = {
     "notify_new_user": True,
     "notify_new_config": True
 }
+PAGE_SIZE = 20
 
 ### ---------------------------- Admin Panel ---------------------------- ###
 def admin_panel_keyboard():
@@ -103,20 +104,42 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 ### --- Admin view list of all users Command --- ###
-async def show_all_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.from_user.id not in CFG["OWNERS"]:
+async def show_all_users(update: Update, context: ContextTypes.DEFAULT_TYPE, page: int = 1):
+    if not is_owner(update.effective_user.id):
         return
 
-    users = DBH.get_all_users()
-    if not users:
-        await update.message.reply_text(TEXTS["errors"]["user_notfound"])
+    total = DBH.count_users()
+    if total == 0:
+        if update.callback_query:
+            await update.callback_query.edit_message_text(TEXTS["errors"]["user_notfound"])
+        else:
+            await update.message.reply_text(TEXTS["errors"]["user_notfound"])
         return
-    
-    users = sorted(users, key=lambda u: u["created_at"] or 0)
 
-    message = f"📊 تعداد کل کاربران: {len(users)}\n\n"
-    message += "\n".join([f"🔹<code>{user["user_id"]}</code> - {user["full_name"] or "بدون نام"}" for user in users])
-    await update.message.reply_text(message[:4096], parse_mode="HTML")  # Telegram max message size
+    max_page = max(1, (total + PAGE_SIZE - 1) // PAGE_SIZE)
+    page = max(1, min(page, max_page))
+    offset = (page - 1) * PAGE_SIZE
+
+    users = DBH.get_users_page(PAGE_SIZE, offset)
+
+    message = (
+        f"📊 تعداد کل کاربران: {total}\n"
+        f"📄 صفحه {page} از {max_page}\n\n" +
+        "\n".join([f"‎🔹<code>{u['user_id']}</code> - {u['full_name'] or 'بدون نام'}" for u in users])
+    )
+
+    buttons = []
+    if page > 1:
+        buttons.append(InlineKeyboardButton("⬅️ قبلی", callback_data=f"show_users:{page-1}"))
+    if page < max_page:
+        buttons.append(InlineKeyboardButton("➡️ بعدی", callback_data=f"show_users:{page+1}"))
+
+    markup = InlineKeyboardMarkup([buttons]) if buttons else None
+
+    if update.callback_query:
+        await update.callback_query.edit_message_text(message[:4096], reply_markup=markup, parse_mode="HTML")
+    else:
+        await update.message.reply_text(message[:4096], reply_markup=markup, parse_mode="HTML")
 
 ### --- Admin view user information Command --- ###
 async def admin_userinfo(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int = None):
@@ -201,6 +224,11 @@ async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_admin(user_id):
         await query.answer(TEXTS["errors"]["access_denied"], show_alert=True)
+        return
+    
+    elif data.startswith("show_users:"):
+        page = int(data.split(":")[1])
+        await show_all_users(update, context, page=page)
         return
     
     elif data.startswith("admin_banuser:"):

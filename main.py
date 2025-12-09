@@ -59,7 +59,7 @@ def main():
     app.add_handler(CallbackQueryHandler(radargame_callbacks, pattern=r"^(server_|dns_|change_account|remove_account|set_active)"))
     app.add_handler(CallbackQueryHandler(global_callbacks, pattern=r"^(emptycallback)$"))
     app.add_handler(CallbackQueryHandler(main_menu_callbacks, pattern=r"^(backtomain|new_config|profile|help)"))
-    app.add_handler(CallbackQueryHandler(admin_callbacks, pattern=r"^(admin_|toggle_user_notify|status_panel|adminpanel)"))
+    app.add_handler(CallbackQueryHandler(admin_callbacks, pattern=r"^(admin_|show_users:|toggle_user_notify|status_panel|adminpanel)"))
 
     # Conversations
     app.add_handler(ConversationHandler(
