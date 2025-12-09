@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
-from core.config_loader import DBH, CFG, reload_config, TEXTS
+from core.config_loader import DBH, TEXTS, reload_config, reload_texts, reload_dns_list
 from core.utils import *
 
 # Admin panel settings:
@@ -25,6 +25,15 @@ def admin_panel_keyboard():
                 TEXTS["admin"]["panel_keyboard"]["new_config_active"] if ADMIN_PANEL["notify_new_config"] else TEXTS["admin"]["panel_keyboard"]["new_config_inactive"],
                 callback_data="toggle_config_notify"
             )
+        ],
+        [
+            InlineKeyboardButton(TEXTS["admin"]["panel_keyboard"]["reload_config"], callback_data="reload_config")
+        ],
+        [
+            InlineKeyboardButton(TEXTS["admin"]["panel_keyboard"]["reload_texts"], callback_data="reload_texts")
+        ],
+        [
+            InlineKeyboardButton(TEXTS["admin"]["panel_keyboard"]["reload_dnslist"], callback_data="reload_dnslist")
         ],
         [
             InlineKeyboardButton(TEXTS["admin"]["panel_keyboard"]["status"], callback_data="status_panel")
@@ -292,6 +301,27 @@ async def admin_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]),
             parse_mode="HTML"
         )
+        return
+    
+    elif data == "reload_config":
+        if reload_config():
+            await query.answer(TEXTS["admin"]["reload_config"]["success"])
+        else:
+            await query.answer(TEXTS["admin"]["reload_config"]["error"])
+        return
+    
+    elif data == "reload_texts":
+        if reload_texts():
+            await query.answer(TEXTS["admin"]["reload_texts"]["success"])
+        else:
+            await query.answer(TEXTS["admin"]["reload_texts"]["error"])
+        return
+    
+    elif data == "reload_dnslist":
+        if reload_dns_list():
+            await query.answer(TEXTS["admin"]["reload_dnslist"]["success"])
+        else:
+            await query.answer(TEXTS["admin"]["reload_dnslist"]["error"])
         return
     
     elif data == "adminpanel":
