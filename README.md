@@ -1,3 +1,6 @@
+> [!NOTE]
+> The upstream service (radar.game) is permanently offline. This repository is archived and kept strictly for educational, research, and portfolio purposes.
+
 # RadarGame Config Telegram Bot
 Telegram bot for recieve RadarGame Wireguard config built in Python
 
@@ -24,6 +27,3 @@ Telegram bot for recieve RadarGame Wireguard config built in Python
     ```bash
     python main.py
     ```
-
-## 👍 Contributing
-Open issues for improvements.
